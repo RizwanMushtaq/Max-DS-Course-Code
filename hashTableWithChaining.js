@@ -1,12 +1,13 @@
-"use strict";
 //How to avoid the collision issues in hash table
-//Resolving Collisions with Open Addressing
-//hashTableWithOpenAddressing
+//Resolving Collisions with Chaining
+//hashTableWithChaining
 
 class HashTable {
   constructor() {
-    this.size = 1000;
-    this.buckets = Array(1000).fill(null);
+    this.size = 16;
+    this.buckets = Array(16)
+      .fill(null)
+      .map(() => []);
   }
 
   hash(key) {
@@ -18,34 +19,29 @@ class HashTable {
   }
 
   set(key, value) {
-    let keyHash = this.hash(key);
-    if (this.buckets[keyHash] === null || this.buckets[keyHash].key === key) {
-      this.buckets[keyHash] = {
-        key: key,
-        val: value,
-      };
+    const keyHash = this.hash(key);
+    const bucketArray = this.buckets[keyHash];
+    const storedElement = bucketArray.find((element) => {
+      return element.key === key;
+    });
+    if (storedElement) {
+      storedElement.val = value;
     } else {
-      while (this.buckets[keyHash] !== null) {
-        keyHash++;
-      }
-      this.buckets[keyHash] = {
+      bucketArray.push({
         key: key,
         val: value,
-      };
+      });
     }
   }
 
   get(key) {
     const keyHash = this.hash(key);
-    for (let i = keyHash; i < this.buckets.length; i++) {
-      if (!this.buckets[i]) {
-        continue;
-      }
-      if (this.buckets[i].key === key) {
-        return this.buckets[i].val;
-      }
-    }
-    return null;
+    const bucketArray = this.buckets[keyHash];
+    const storedElement = bucketArray.find((element) => {
+      return element.key === key;
+    });
+
+    return storedElement;
   }
 
   showInfo() {
@@ -58,6 +54,7 @@ class HashTable {
 }
 
 const table1 = new HashTable();
+
 for (const char of "hallo world") {
   table1.set(char, char);
 }
